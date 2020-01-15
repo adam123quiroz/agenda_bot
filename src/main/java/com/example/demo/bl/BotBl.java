@@ -6,7 +6,6 @@ import com.example.demo.bot.MainBot;
 import com.example.demo.dao.*;
 import com.example.demo.domain.AgContact;
 import com.example.demo.domain.AgPerson;
-import com.example.demo.domain.AgPhone;
 import com.example.demo.domain.AgUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -116,7 +115,6 @@ public class BotBl {
                 listOptions.add("Modificar");
                 listOptions.add("Eliminar");
                 listOptions.add("Buscar Contacto");
-                listOptions.add("Listar");
                 ComandManager comandManager = new ComandManager(listOptions);
                 mainBot.execute(comandManager.showMenu("Elija una Opcion", update));
                 break;
@@ -182,7 +180,7 @@ public class BotBl {
                 mainBot.execute(comandManager.showMenu("Elija una Opcion", update));
                 break;
             case "Buscar Contacto":
-                SequenceFindContact sequenceFindContact = new SequenceFindContact(contactRepository, user, mainBot, contactBl);
+                SequenceFindContact sequenceFindContact = new SequenceFindContact(contactRepository, mainBot, contactBl);
                 sequenceFindContact.setStepActually(0);
                 sequenceFindContact.setNumberStep(2);
                 sequenceFindContact.setRunning(true);

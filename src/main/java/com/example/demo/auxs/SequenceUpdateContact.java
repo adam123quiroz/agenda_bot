@@ -51,7 +51,7 @@ public class SequenceUpdateContact extends Sequence {
             case 0:
                 List<String> name = Arrays.asList(text.split(" "));
                 AgContact contact = contactRepository.findByIdContactAndStatus(Integer.parseInt(name.get(0)), 1);
-                LOGGER.info("paso {}", contact.getIdPerson());
+                contact.getIdPerson();
                 contactManagerBl.setContact(contact);
                 List<String> listOptions = new ArrayList<>();
                 listOptions.add("Nombres");
@@ -79,7 +79,6 @@ public class SequenceUpdateContact extends Sequence {
     }
 
     private void chooseAttribute(String text) throws IOException {
-        LOGGER.info("VALUEEEE {}", value);
         switch (value) {
             case "Nombres":
                 if (!contactManagerBl.setName(text)){

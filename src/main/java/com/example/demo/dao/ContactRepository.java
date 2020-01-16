@@ -12,9 +12,19 @@ public interface ContactRepository extends JpaRepository<AgContact, Integer > {
 
     AgContact findByIdContactAndStatus(Integer id, int status);
 
-    @Query(value = "SELECT * FROM ag_contact a, ag_person b where a.id_person = b.id_person AND (b.first_name  LIKE %?1% OR b.last_name LIKE %?1%) ", nativeQuery = true)
-    List<AgContact> findAllContactByParecido(String parecido);
+    @Query(value = "" +
+            "SELECT * " +
+            "FROM ag_contact a, ag_person b " +
+            "WHERE a.id_person = b.id_person " +
+            "AND a.id_user = ?2 " +
+            "AND (b.first_name  LIKE %?1% OR b.last_name LIKE %?1%) ", nativeQuery = true)
+    List<AgContact> findAllContactByParecidoAndIdUser(String parecido, Integer idUser);
 
-    @Query(value = "SELECT * FROM ag_phone a, ag_contact b where a.id_contact = b.id_contact AND a.phone LIKE %?1% ", nativeQuery = true)
-    List<AgContact> findAllTelefonoByParecido(String parecido);
+    @Query(value = "" +
+            "SELECT * " +
+            "FROM ag_phone a, ag_contact b " +
+            "WHERE a.id_contact = b.id_contact " +
+            "AND b.id_user = ?2 " +
+            "AND a.phone LIKE %?1% ", nativeQuery = true)
+    List<AgContact> findAllTelefonoByParecidoAndIdUser(String parecido, Integer idUser);
 }

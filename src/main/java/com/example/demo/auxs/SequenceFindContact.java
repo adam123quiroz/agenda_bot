@@ -5,6 +5,7 @@ import com.example.demo.bot.ComandManager;
 import com.example.demo.bot.MainBot;
 import com.example.demo.dao.ContactRepository;
 import com.example.demo.domain.AgContact;
+import com.example.demo.domain.AgUser;
 import com.example.demo.dto.ContactDto;
 import com.example.demo.dto.FileDto;
 import com.example.demo.dto.PhoneDto;
@@ -20,16 +21,18 @@ public class SequenceFindContact extends Sequence {
 
     private ContactRepository contactRepository;
     private ContactBl contactBl;
+    private AgUser agUser;
 
     private MainBot mainBot;
 
     public SequenceFindContact(ContactRepository contactRepository,
                                MainBot mainBot,
-                               ContactBl contactBl) {
+                               ContactBl contactBl,
+                               AgUser agUser) {
         this.contactRepository = contactRepository;
         this.mainBot =  mainBot;
         this.contactBl =  contactBl;
-
+        this.agUser =  agUser;
     }
 
     @Override
@@ -40,13 +43,13 @@ public class SequenceFindContact extends Sequence {
                 ConcatListContact concatListContact = null;
                 List<AgContact> contactList = null;
                 if (validateNumber(text)) {
-                    contactList = contactRepository.findAllTelefonoByParecido(text);
+                    contactList = contactRepository.findAllTelefonoByParecidoAndIdUser(text, agUser.getIdUser());
 
                     concatListContact = new ConcatListContact(contactList);
                 }
 
                 if (onlyLetters(text)) {
-                    contactList = contactRepository.findAllContactByParecido(text);
+                    contactList = contactRepository.findAllContactByParecidoAndIdUser(text, agUser.getIdUser());
                     concatListContact = new ConcatListContact(contactList);
 
                 }

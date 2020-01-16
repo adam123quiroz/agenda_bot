@@ -91,6 +91,7 @@ public class ContactManagerBl {
             AgPhone aPhone = new AgPhone();
             aPhone.setPhone(Integer.parseInt(data));
             aPhone.setIdContact(contact);
+            aPhone.setStatus(1);
             aPhone.setTxDate(new Date(new java.util.Date().getTime()));
             aPhone.setTxHost("localhost");
             aPhone.setTxUser(contact.getIdPerson().getFirstName());

@@ -182,7 +182,7 @@ public class BotBl {
                 mainBot.execute(comandManager.showMenu("Elija una Opcion", update));
                 break;
             case "Buscar Contacto":
-                SequenceFindContact sequenceFindContact = new SequenceFindContact(contactRepository, mainBot, contactBl);
+                SequenceFindContact sequenceFindContact = new SequenceFindContact(contactRepository, mainBot, contactBl, user);
                 sequenceFindContact.setStepActually(0);
                 sequenceFindContact.setNumberStep(2);
                 sequenceFindContact.setRunning(true);

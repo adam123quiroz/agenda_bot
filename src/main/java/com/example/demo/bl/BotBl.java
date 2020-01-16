@@ -74,7 +74,6 @@ public class BotBl {
 
 
     private void continueChatWithUser(AgUser user, List<String> chatResponse) throws TelegramApiException, IOException {
-
         Sequence sequence = MainBot.getSequenceByChatId(update.getMessage().getChat().getId().toString());
         if (sequence != null) {
             if (sequence.isRunning()) {

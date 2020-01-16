@@ -29,10 +29,13 @@ public class SequenceUpdateContact extends Sequence {
     private ContactUpdateManagerBl contactUpdateManagerBl;
     private MainBot mainBot;
     private String value;
+
     private int countPhoneSequence = 0;
     private int countPhone = 0;
+
     private boolean flagPhone = false;
     private boolean flagPhoneUpdate = false;
+
     private String option;
 
     private AgPhone agPhone = null;
@@ -57,8 +60,10 @@ public class SequenceUpdateContact extends Sequence {
             case 0:
                 List<String> name = Arrays.asList(text.split(" "));
                 AgContact contact = contactRepository.findByIdContactAndStatus(Integer.parseInt(name.get(0)), 1);
+
                 LOGGER.info("{}", contact.getIdPerson());
                 LOGGER.info("gg {}",contact.getAgPhoneList());
+
                 contactUpdateManagerBl.setContact(contact);
                 List<String> listOptions = new ArrayList<>();
                 listOptions.add("Nombres");
@@ -93,7 +98,6 @@ public class SequenceUpdateContact extends Sequence {
                                 LOGGER.info("gg {}", contactUpdateManagerBl.getContact().getAgPhoneList());
                                 ConcatListPhone concatListPhone = new ConcatListPhone(phoneList);
                                 ComandManager manager = new ComandManager(concatListPhone.getStringListContact());
-
                                 mainBot.execute(manager.showMenu("Elija una Telefono para Editarlo", update));
                             } else if (option.
                                     equalsIgnoreCase("Añadir mas Numeros de Telefono al Contacto")) {
@@ -123,12 +127,10 @@ public class SequenceUpdateContact extends Sequence {
                                         case 0:
                                             agPhone = telefonoRepository.findByPhoneAndStatus(Integer.parseInt(value), 1);
                                             LOGGER.info("GG Phone {}", agPhone.getIdContact());
-                                            LOGGER.info("Estoy AQUI 2");
                                             chatResponce.add("Ingrese el nuevo telefono");
                                             break;
                                         case 1:
-                                            LOGGER.info("Estoy AQUI 3");
-                                            if (! contactUpdateManagerBl.setPhoneUpdate(value, agPhone.getIdContact(), agPhone)) {
+                                            if (! contactUpdateManagerBl.setPhoneUpdate(value, agPhone)) {
                                                 chatResponce.add("Debe Ingresar un telefono valido, ingrese de nuevo");
                                                 countPhone = 0;
                                             } else {
@@ -188,12 +190,7 @@ public class SequenceUpdateContact extends Sequence {
                     setStepActually(1);
                 }
                 break;
-            case "Numero de Telefono":
-                if (!contactUpdateManagerBl.setPhone(text, contactUpdateManagerBl.getContact())) {
-                    chatResponce.add("Debe Ingresar un telefono valido, ingrese de nuevo");
-                    setStepActually(1);
-                }
-                break;
+
             case "Foto de Contacto":
                 LOGGER.info("nameFile {}");
                 if( ! (text instanceof String) ) {

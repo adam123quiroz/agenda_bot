@@ -4,6 +4,5 @@ import com.example.demo.domain.AgPhone;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface TelefonoRepository extends JpaRepository<AgPhone, Integer> {
-
-
+    AgPhone findByPhoneAndStatus(int number, int status);
 }

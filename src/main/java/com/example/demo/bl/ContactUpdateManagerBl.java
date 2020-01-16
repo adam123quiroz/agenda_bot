@@ -99,5 +99,15 @@ public class ContactUpdateManagerBl {
         return flag;
     }
 
+    public boolean setPhoneUpdate(String data, AgContact contact, AgPhone aPhone){
+        boolean flag = false;
+        if (Validation.validatePhone(data)){
+            aPhone.setPhone(Integer.parseInt(data));
+            telefonoRepository.save(aPhone);
+            flag = true;
+        }
+        return flag;
+    }
+
 
 }

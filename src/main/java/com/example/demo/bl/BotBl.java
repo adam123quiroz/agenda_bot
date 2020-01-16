@@ -31,6 +31,7 @@ public class BotBl {
     private FileRepository fileRepository;
     private ContactFileRepository contactFileRepository;
     private ContactRepository contactRepository;
+    private TelefonoRepository telefonoRepository;
 
     private ContactBl contactBl;
     private ContactManagerBl contactManagerBl;
@@ -44,6 +45,7 @@ public class BotBl {
                  PersonRepository personRepository,
                  FileRepository fileRepository,
                  ContactFileRepository contactFileRepository,
+                 TelefonoRepository telefonoRepository,
                  ContactRepository contactRepository,
                  ContactBl contactBl,
                  ContactManagerBl contactManagerBl,
@@ -52,6 +54,7 @@ public class BotBl {
         this.personRepository = personRepository;
         this.fileRepository = fileRepository;
         this.contactFileRepository = contactFileRepository;
+        this.telefonoRepository = telefonoRepository;
         this.contactRepository = contactRepository;
         this.contactBl = contactBl;
         this.contactManagerBl = contactManagerBl;
@@ -140,6 +143,7 @@ public class BotBl {
             case "Modificar":
                 SequenceUpdateContact sequenceUpdateContact = new SequenceUpdateContact(
                         contactRepository,
+                        telefonoRepository,
                         mainBot,
                         contactUpdateManagerBl
                 );

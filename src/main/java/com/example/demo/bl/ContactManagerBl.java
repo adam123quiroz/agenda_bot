@@ -92,7 +92,7 @@ public class ContactManagerBl {
             aPhone.setPhone(Integer.parseInt(data));
             aPhone.setIdContact(contact);
             aPhone.setStatus(1);
-            aPhone.setTxDate(new Date(new java.util.Date().getTime()));
+            aPhone.setTxDate(new Date());
             aPhone.setTxHost("localhost");
             aPhone.setTxUser(contact.getIdPerson().getFirstName());
             telefonoRepository.save(aPhone);

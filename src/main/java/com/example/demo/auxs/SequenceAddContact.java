@@ -29,10 +29,8 @@ public class SequenceAddContact extends Sequence {
     private ContactManagerBl contactManagerBl;
     private AgUser user;
 
-    public SequenceAddContact(PersonRepository personRepository,
-                              FileRepository fileRepository,
+    public SequenceAddContact(FileRepository fileRepository,
                               ContactFileRepository contactFileRepository,
-                              TelefonoRepository telefonoRepository,
                               ContactRepository contactRepository,
                               AgUser user,
                               ContactManagerBl contactManagerBl) {
@@ -99,8 +97,7 @@ public class SequenceAddContact extends Sequence {
             case 5:
                 if( ! (text instanceof String) ) {
                     BufferedImage bImage;
-                    String nameFile = String.valueOf(contactManagerBl.getContact().getIdContact());
-
+                    String nameFile = contactManagerBl.getContact().getIdUser().getBotUserId()+"-"+contactManagerBl.getContact().getIdContact();
                     String storeType = "C";
                     String path = "://img/";
                     String mimeType = "jpg";
@@ -128,6 +125,8 @@ public class SequenceAddContact extends Sequence {
                     userFile.setTxDate(new Date());
                     userFile.setTxHost("localhost");
                     contactFileRepository.save(userFile);
+
+                    chatResponce.add("Contacto Agregado Exitosamente, vuelve a escribir Hola para cotinuar");
                 } else {
                     chatResponce.add("Enviame una foto");
                 }

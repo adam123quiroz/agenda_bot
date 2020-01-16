@@ -22,16 +22,8 @@ public class SequenceDeleteContact extends Sequence {
     private AgUser user;
     private MainBot mainBot;
     private AgContact contact;
-    private String value;
 
-    private List<String> chatResponce;
-
-    public SequenceDeleteContact(UserRepository userRepository,
-                                 PersonRepository personRepository,
-                                 FileRepository fileRepository,
-                                 ContactFileRepository contactFileRepository,
-                                 TelefonoRepository telefonoRepository,
-                                 ContactRepository contactRepository,
+    public SequenceDeleteContact(ContactRepository contactRepository,
                                  AgUser user,
                                  MainBot mainBot) {
         this.contactRepository = contactRepository;
@@ -43,7 +35,6 @@ public class SequenceDeleteContact extends Sequence {
     @Override
     public void runSequence(Update update, List<String> chatResponce) throws IOException, TelegramApiException {
         String text = update.getMessage().getText();
-        this.chatResponce = chatResponce;
         switch (getStepActually()) {
             case 0:
                 List<String> name = Arrays.asList(text.split(" "));

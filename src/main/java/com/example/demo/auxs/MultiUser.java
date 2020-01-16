@@ -52,7 +52,6 @@ public class MultiUser implements Runnable {
                         e.printStackTrace();
                     }
                 }
-
             }
         }
     }

@@ -7,6 +7,7 @@ import com.example.demo.bot.ComandManager;
 import com.example.demo.bot.MainBot;
 import com.example.demo.dao.*;
 import com.example.demo.domain.AgContact;
+import com.example.demo.domain.AgPhone;
 import com.example.demo.domain.AgUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,18 +28,18 @@ public class SequenceUpdateContact extends Sequence {
     private ContactRepository contactRepository;
 
     private ContactUpdateManagerBl contactManagerBl;
-    private AgUser user;
     private MainBot mainBot;
     private String value;
+    private int countPhoneSequence = 0;
+    private boolean flagPhone = false;
+    private String option;
 
     private List<String> chatResponce;
 
     public SequenceUpdateContact(ContactRepository contactRepository,
-                                 AgUser user,
                                  MainBot mainBot,
                                  ContactUpdateManagerBl contactManagerBl) {
         this.contactRepository = contactRepository;
-        this.user = user;
         this.mainBot =  mainBot;
         this.contactManagerBl = contactManagerBl;
     }
@@ -51,7 +52,8 @@ public class SequenceUpdateContact extends Sequence {
             case 0:
                 List<String> name = Arrays.asList(text.split(" "));
                 AgContact contact = contactRepository.findByIdContactAndStatus(Integer.parseInt(name.get(0)), 1);
-                contact.getIdPerson();
+                LOGGER.info("{}", contact.getIdPerson());
+                LOGGER.info("gg {}",contact.getAgPhoneList());
                 contactManagerBl.setContact(contact);
                 List<String> listOptions = new ArrayList<>();
                 listOptions.add("Nombres");
@@ -65,7 +67,56 @@ public class SequenceUpdateContact extends Sequence {
                 break;
             case 1:
                 value = text;
-                chatResponce.add("Cual es nuevo valor?");
+                if (value.equalsIgnoreCase("Numero de Telefono")) {
+                    flagPhone = true;
+                }
+                if (flagPhone) {
+                    switch (countPhoneSequence) {
+                        case 0:
+                            List<String> listPhoneOption = new ArrayList<>();
+                            listPhoneOption.add("Editar Numeros Existentes");
+                            listPhoneOption.add("Añadir mas Numeros de Telefono al Contacto");
+                            ComandManager comandManagerPhone = new ComandManager(listPhoneOption);
+                            mainBot.execute(comandManagerPhone.showMenu("Elija una Opcion", update));
+                            break;
+                        case 1:
+                            option = text;
+                            if (option.equalsIgnoreCase("Editar Numeros Existentes")) {
+
+                                List<AgPhone> phoneList = contactManagerBl.getContact().getAgPhoneList();
+                                LOGGER.info("gg {}", contactManagerBl.getContact().getAgPhoneList());
+                                ConcatListPhone concatListPhone = new ConcatListPhone(phoneList);
+                                ComandManager manager = new ComandManager(concatListPhone.getStringListContact());
+
+                                mainBot.execute(manager.showMenu("Elija una Telefono para Editarlo", update));
+                            } else if (option.
+                                    equalsIgnoreCase("Añadir mas Numeros de Telefono al Contacto")) {
+                               chatResponce.add("ingrese el nuevo numero para añadir al Contacto");
+                            } else {
+                                chatResponce.add("Opcion Invalida");
+                                setRunning(false);
+                            }
+                            break;
+                        case 2:
+                            if (option.equalsIgnoreCase("Añadir mas Numeros de Telefono al Contacto")) {
+                                if (!contactManagerBl.setPhone(text, contactManagerBl.getContact())) {
+                                    chatResponce.add("Debe Ingresar un telefono valido, ingrese de nuevo");
+                                    countPhoneSequence = 1;
+                                }
+                                setRunning(false);
+                                chatResponce.add("Telefono Agregado con Exito");
+                            }
+                            if (option.
+                                    equalsIgnoreCase("Editar Numeros Existentes")) {
+                                //TODO: tenemos que arreglar la logica
+                            }
+                            break;
+                    }
+                    countPhoneSequence += 1;
+                    setStepActually(0);
+                } else {
+                    chatResponce.add("Cual es nuevo valor?");
+                }
                 break;
             case 2:
                 chooseAttribute(text);
@@ -75,37 +126,38 @@ public class SequenceUpdateContact extends Sequence {
         setStepActually(getStepActually() + 1);
         if (getStepActually() == 3){
             setRunning(false);
+            chatResponce.add("Actualizacion correcta");
         }
     }
 
     private void chooseAttribute(String text) throws IOException {
         switch (value) {
             case "Nombres":
-                if (!contactManagerBl.setName(text)){
+                if (!contactManagerBl.setName(text)) {
                     chatResponce.add("Debe ingresar un nombre valido, vuelve a ingresar");
                     setStepActually(1);
                 }
                 break;
             case "Apellidos":
-                if (!contactManagerBl.setLastName(text)){
+                if (!contactManagerBl.setLastName(text)) {
                     chatResponce.add("Debe ingresar  apellidos correctamente, vuelve a ingresar");
                     setStepActually(1);
                 }
                 break;
             case "Correo Electronico":
-                if (!contactManagerBl.setEmail(text)){
+                if (!contactManagerBl.setEmail(text)) {
                     chatResponce.add("Debe ingresar correo valido, vuelve a ingresar");
                     setStepActually(1);
                 }
                 break;
             case "Fecha de Nacimiento":
-                if (!contactManagerBl.setBirthday(text)){
+                if (!contactManagerBl.setBirthday(text)) {
                     chatResponce.add("Debe ingresar formato de fecha valida, ej: 2019-06-13, vuelve a ingresar");
                     setStepActually(1);
                 }
                 break;
             case "Numero de Telefono":
-                if (!contactManagerBl.setPhone(text, contactManagerBl.getContact())){
+                if (!contactManagerBl.setPhone(text, contactManagerBl.getContact())) {
                     chatResponce.add("Debe Ingresar un telefono valido, ingrese de nuevo");
                     setStepActually(1);
                 }
@@ -113,10 +165,8 @@ public class SequenceUpdateContact extends Sequence {
             case "Foto de Contacto":
                 LOGGER.info("nameFile {}");
                 if( ! (text instanceof String) ) {
-                    BufferedImage bImage = null;
-                    String nameFile = String.valueOf(contactManagerBl.getContact().getIdContact());
-                    LOGGER.info("nameFile {}", nameFile);
-
+                    BufferedImage bImage;
+                    String nameFile = contactManagerBl.getContact().getIdUser().getBotUserId()+"-"+contactManagerBl.getContact().getIdContact();
                     String storeType = "C";
                     String path = "://img/";
                     String mimeType = "jpg";
@@ -124,7 +174,10 @@ public class SequenceUpdateContact extends Sequence {
                     SavePhoto savePhoto = new SavePhoto(BotBl.update, BotBl.mainBot);
                     bImage = ImageIO.read(savePhoto.downloadPhotoByFilePath(savePhoto.getFilePath(savePhoto.getPhoto())));
                     ImageIO.write(bImage, mimeType, new File(pathName));
+                    chatResponce.add("Actualizacion correcta");
 
+                } else {
+                    chatResponce.add("enviame una foto");
                 }
                 break;
         }

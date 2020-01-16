@@ -91,6 +91,7 @@ public class ContactUpdateManagerBl {
             aPhone.setIdContact(contact);
             aPhone.setTxDate(new Date(new Date().getTime()));
             aPhone.setTxHost("localhost");
+            aPhone.setStatus(1);
             aPhone.setTxUser(contact.getIdPerson().getFirstName());
             telefonoRepository.save(aPhone);
             flag = true;

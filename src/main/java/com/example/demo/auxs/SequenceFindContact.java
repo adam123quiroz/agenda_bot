@@ -9,6 +9,8 @@ import com.example.demo.domain.AgUser;
 import com.example.demo.dto.ContactDto;
 import com.example.demo.dto.FileDto;
 import com.example.demo.dto.PhoneDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -17,7 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class SequenceFindContact extends Sequence {
-//    private static final Logger LOGGER = LoggerFactory.getLogger(SequenceFindContact.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SequenceFindContact.class);
 
     private ContactRepository contactRepository;
     private ContactBl contactBl;
@@ -43,13 +45,15 @@ public class SequenceFindContact extends Sequence {
                 ConcatListContact concatListContact = null;
                 List<AgContact> contactList = null;
                 if (validateNumber(text)) {
-                    contactList = contactRepository.findAllTelefonoByParecidoAndIdUser(text, agUser.getIdUser());
+                    contactList = contactRepository.
+                            findAllTelefonoByParecidoAndIdUserAndStatus(text, agUser.getIdUser(), 1);
 
                     concatListContact = new ConcatListContact(contactList);
                 }
 
                 if (onlyLetters(text)) {
-                    contactList = contactRepository.findAllContactByParecidoAndIdUser(text, agUser.getIdUser());
+                    contactList = contactRepository.
+                            findAllContactByParecidoAndIdUserAndStatus(text, agUser.getIdUser(), 1);
                     concatListContact = new ConcatListContact(contactList);
 
                 }
@@ -80,11 +84,11 @@ public class SequenceFindContact extends Sequence {
 
                 message.setText("*Fecha de Nacimiento:*\n"+contactDto.getFechaNac());
                 mainBot.execute(message);
-
+                LOGGER.info("lista phone {}", contactDto.getTelefonoList());
                 String telefonos = "";
                 for (PhoneDto tel :
                         contactDto.getTelefonoList()) {
-                    telefonos = "" + tel.getNumero().toString()+"\n";
+                    telefonos = telefonos.concat("" + tel.getNumero().toString()+"\n");
                 }
                 message.setText("*Telefonos:*\n"+telefonos);
                 mainBot.execute(message);

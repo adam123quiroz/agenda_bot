@@ -30,14 +30,11 @@ public class BotBl {
     private PersonRepository personRepository;
     private FileRepository fileRepository;
     private ContactFileRepository contactFileRepository;
-    private TelefonoRepository telefonoRepository;
     private ContactRepository contactRepository;
 
     private ContactBl contactBl;
     private ContactManagerBl contactManagerBl;
     private ContactUpdateManagerBl contactUpdateManagerBl;
-
-    private AdminChat adminChat;
 
     public static Update update;
     public static MainBot mainBot;
@@ -47,7 +44,6 @@ public class BotBl {
                  PersonRepository personRepository,
                  FileRepository fileRepository,
                  ContactFileRepository contactFileRepository,
-                 TelefonoRepository telefonoRepository,
                  ContactRepository contactRepository,
                  ContactBl contactBl,
                  ContactManagerBl contactManagerBl,
@@ -56,7 +52,6 @@ public class BotBl {
         this.personRepository = personRepository;
         this.fileRepository = fileRepository;
         this.contactFileRepository = contactFileRepository;
-        this.telefonoRepository = telefonoRepository;
         this.contactRepository = contactRepository;
         this.contactBl = contactBl;
         this.contactManagerBl = contactManagerBl;
@@ -64,8 +59,8 @@ public class BotBl {
     }
 
     public List<String> processUpdate(Update update, MainBot mainBot) throws TelegramApiException, IOException {
-        this.update = update;
-        this.mainBot = mainBot;
+        BotBl.update = update;
+        BotBl.mainBot = mainBot;
         List<String> chatResponse = new ArrayList<>();
         AgUser user = initUser(update.getMessage().getFrom());
         user.getIdPerson().getFirstName();
@@ -128,10 +123,8 @@ public class BotBl {
 
             case "Agregar":
                 SequenceAddContact sequenceAddContact = new SequenceAddContact(
-                        personRepository,
                         fileRepository,
                         contactFileRepository,
-                        telefonoRepository,
                         contactRepository,
                         user,
                         contactManagerBl
@@ -147,7 +140,6 @@ public class BotBl {
             case "Modificar":
                 SequenceUpdateContact sequenceUpdateContact = new SequenceUpdateContact(
                         contactRepository,
-                        user,
                         mainBot,
                         contactUpdateManagerBl
                 );
@@ -163,11 +155,6 @@ public class BotBl {
                 break;
             case "Eliminar":
                 SequenceDeleteContact sequenceDeleteContact = new SequenceDeleteContact(
-                        userRepository,
-                        personRepository,
-                        fileRepository,
-                        contactFileRepository,
-                        telefonoRepository,
                         contactRepository,
                         user,
                         mainBot

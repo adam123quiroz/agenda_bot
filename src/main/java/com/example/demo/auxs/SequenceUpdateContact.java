@@ -1,6 +1,8 @@
 package com.example.demo.auxs;
 
 import com.example.demo.bl.BotBl;
+import com.example.demo.bl.ContactManagerBl;
+import com.example.demo.bl.ContactUpdateManagerBl;
 import com.example.demo.bot.ComandManager;
 import com.example.demo.bot.MainBot;
 import com.example.demo.dao.*;
@@ -22,51 +24,35 @@ import java.util.List;
 public class SequenceUpdateContact extends Sequence {
     private static final Logger LOGGER = LoggerFactory.getLogger(SequenceUpdateContact.class);
 
-    private UserRepository userRepository;
-    private PersonRepository personRepository;
-    private FileRepository fileRepository;
-    private ContactFileRepository contactFileRepository;
-    private TelefonoRepository telefonoRepository;
     private ContactRepository contactRepository;
 
-    private ContactManager contactManager;
+    private ContactUpdateManagerBl contactManagerBl;
     private AgUser user;
     private MainBot mainBot;
-    private AgContact contact;
     private String value;
 
     private List<String> chatResponce;
 
-    public SequenceUpdateContact(UserRepository userRepository,
-                                 PersonRepository personRepository,
-                                 FileRepository fileRepository,
-                                 ContactFileRepository contactFileRepository,
-                                 TelefonoRepository telefonoRepository,
-                                 ContactRepository contactRepository,
+    public SequenceUpdateContact(ContactRepository contactRepository,
                                  AgUser user,
-                                 MainBot mainBot) {
-        this.userRepository = userRepository;
-        this.personRepository = personRepository;
-        this.fileRepository = fileRepository;
-        this.contactFileRepository = contactFileRepository;
-        this.telefonoRepository = telefonoRepository;
+                                 MainBot mainBot,
+                                 ContactUpdateManagerBl contactManagerBl) {
         this.contactRepository = contactRepository;
         this.user = user;
         this.mainBot =  mainBot;
-        this.contactManager = new ContactManager(telefonoRepository, personRepository);
+        this.contactManagerBl = contactManagerBl;
     }
 
     @Override
     public void runSequence(Update update, List<String> chatResponce) throws IOException, TelegramApiException {
-        LOGGER.info("paso {}", getStepActually());
         String text = update.getMessage().getText();
         this.chatResponce = chatResponce;
         switch (getStepActually()) {
             case 0:
                 List<String> name = Arrays.asList(text.split(" "));
                 AgContact contact = contactRepository.findByIdContactAndStatus(Integer.parseInt(name.get(0)), 1);
-                this.contact = contact;
-                contactManager.setContact(contact);
+                LOGGER.info("paso {}", contact.getIdPerson());
+                contactManagerBl.setContact(contact);
                 List<String> listOptions = new ArrayList<>();
                 listOptions.add("Nombres");
                 listOptions.add("Apellidos");
@@ -78,12 +64,10 @@ public class SequenceUpdateContact extends Sequence {
                 mainBot.execute(comandManager.showMenu("Elija Atributo que quiere cambiar", update));
                 break;
             case 1:
-                LOGGER.info("VALUEEEE 1");
                 value = text;
                 chatResponce.add("Cual es nuevo valor?");
                 break;
             case 2:
-                LOGGER.info("VALUEEEE 2");
                 chooseAttribute(text);
                 break;
         }
@@ -98,31 +82,31 @@ public class SequenceUpdateContact extends Sequence {
         LOGGER.info("VALUEEEE {}", value);
         switch (value) {
             case "Nombres":
-                if (!contactManager.setName(text)){
+                if (!contactManagerBl.setName(text)){
                     chatResponce.add("Debe ingresar un nombre valido, vuelve a ingresar");
                     setStepActually(1);
                 }
                 break;
             case "Apellidos":
-                if (!contactManager.setLastName(text)){
+                if (!contactManagerBl.setLastName(text)){
                     chatResponce.add("Debe ingresar  apellidos correctamente, vuelve a ingresar");
                     setStepActually(1);
                 }
                 break;
             case "Correo Electronico":
-                if (!contactManager.setEmail(text)){
+                if (!contactManagerBl.setEmail(text)){
                     chatResponce.add("Debe ingresar correo valido, vuelve a ingresar");
                     setStepActually(1);
                 }
                 break;
             case "Fecha de Nacimiento":
-                if (!contactManager.setBirthday(text)){
+                if (!contactManagerBl.setBirthday(text)){
                     chatResponce.add("Debe ingresar formato de fecha valida, ej: 2019-06-13, vuelve a ingresar");
                     setStepActually(1);
                 }
                 break;
             case "Numero de Telefono":
-                if (!contactManager.setPhone(text, contactManager.getContact())){
+                if (!contactManagerBl.setPhone(text, contactManagerBl.getContact())){
                     chatResponce.add("Debe Ingresar un telefono valido, ingrese de nuevo");
                     setStepActually(1);
                 }
@@ -131,7 +115,7 @@ public class SequenceUpdateContact extends Sequence {
                 LOGGER.info("nameFile {}");
                 if( ! (text instanceof String) ) {
                     BufferedImage bImage = null;
-                    String nameFile = String.valueOf(contactManager.getContact().getIdContact());
+                    String nameFile = String.valueOf(contactManagerBl.getContact().getIdContact());
                     LOGGER.info("nameFile {}", nameFile);
 
                     String storeType = "C";
@@ -145,6 +129,6 @@ public class SequenceUpdateContact extends Sequence {
                 }
                 break;
         }
-        contactRepository.save(contact);
+        contactRepository.save(contactManagerBl.getContact());
     }
 }

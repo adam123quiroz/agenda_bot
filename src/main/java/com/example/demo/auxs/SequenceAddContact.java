@@ -1,6 +1,7 @@
 package com.example.demo.auxs;
 
 import com.example.demo.bl.BotBl;
+import com.example.demo.bl.ContactManagerBl;
 import com.example.demo.dao.*;
 import com.example.demo.domain.AgContactFile;
 import com.example.demo.domain.AgFile;
@@ -25,7 +26,7 @@ public class SequenceAddContact extends Sequence {
     private ContactFileRepository contactFileRepository;
     private ContactRepository contactRepository;
 
-    private ContactManager contactManager;
+    private ContactManagerBl contactManagerBl;
     private AgUser user;
 
     public SequenceAddContact(PersonRepository personRepository,
@@ -33,12 +34,13 @@ public class SequenceAddContact extends Sequence {
                               ContactFileRepository contactFileRepository,
                               TelefonoRepository telefonoRepository,
                               ContactRepository contactRepository,
-                              AgUser user) {
+                              AgUser user,
+                              ContactManagerBl contactManagerBl) {
         this.fileRepository = fileRepository;
         this.contactFileRepository = contactFileRepository;
         this.contactRepository = contactRepository;
         this.user = user;
-        this.contactManager = new ContactManager(telefonoRepository, personRepository);
+        this.contactManagerBl = contactManagerBl;
 
     }
 
@@ -47,7 +49,7 @@ public class SequenceAddContact extends Sequence {
         String text = update.getMessage().getText();
         switch (getStepActually()) {
             case 0:
-                if (!contactManager.setName(text)){
+                if (!contactManagerBl.setName(text)){
                     chatResponce.add("Debe ingresar un nombre valido, vuelve a ingresar");
                     setStepActually(-1);
                 } else {
@@ -55,7 +57,7 @@ public class SequenceAddContact extends Sequence {
                 }
                 break;
             case 1:
-                if (!contactManager.setLastName(text)){
+                if (!contactManagerBl.setLastName(text)){
                     chatResponce.add("Debe ingresar  apellidos correctamente, vuelve a ingresar");
                     setStepActually(0);
                 } else {
@@ -63,7 +65,7 @@ public class SequenceAddContact extends Sequence {
                 }
                 break;
             case 2:
-                if (!contactManager.setEmail(text)){
+                if (!contactManagerBl.setEmail(text)){
                     chatResponce.add("Debe ingresar correo valido, vuelve a ingresar");
                     setStepActually(1);
                 } else {
@@ -71,23 +73,23 @@ public class SequenceAddContact extends Sequence {
                 }
                 break;
             case 3:
-                if (!contactManager.setBirthday(text)){
+                if (!contactManagerBl.setBirthday(text)){
                     chatResponce.add("Debe ingresar formato de fecha valida, ej: 2019-06-13, vuelve a ingresar");
                     setStepActually(2);
                 } else {
-                    contactManager.getContact().setIdUser(user);
-                    contactManager.getContact().setStatus(1);
-                    contactManager.getContact().setTxHost("localhost");
-                    contactManager.getContact().setTxDate(new Date());
-                    contactManager.getContact().setTxUser(user.getIdPerson().getFirstName());
-                    LOGGER.info("contact {}", contactManager.getContact().toString());
+                    contactManagerBl.getContact().setIdUser(user);
+                    contactManagerBl.getContact().setStatus(1);
+                    contactManagerBl.getContact().setTxHost("localhost");
+                    contactManagerBl.getContact().setTxDate(new Date());
+                    contactManagerBl.getContact().setTxUser(user.getIdPerson().getFirstName());
+                    LOGGER.info("contact {}", contactManagerBl.getContact().toString());
 
-                    contactRepository.save(contactManager.getContact());
+                    contactRepository.save(contactManagerBl.getContact());
                     chatResponce.add("Ingresa el numero de telefono");
                 }
                 break;
             case 4:
-                if (!contactManager.setPhone(text, contactManager.getContact())){
+                if (!contactManagerBl.setPhone(text, contactManagerBl.getContact())){
                     chatResponce.add("Debe Ingresar un telefono valido, ingrese de nuevo");
                     setStepActually(3);
                 } else {
@@ -97,7 +99,7 @@ public class SequenceAddContact extends Sequence {
             case 5:
                 if( ! (text instanceof String) ) {
                     BufferedImage bImage;
-                    String nameFile = String.valueOf(contactManager.getContact().getIdContact());
+                    String nameFile = String.valueOf(contactManagerBl.getContact().getIdContact());
 
                     String storeType = "C";
                     String path = "://img/";
@@ -120,7 +122,7 @@ public class SequenceAddContact extends Sequence {
 
                     AgContactFile userFile = new AgContactFile();
                     userFile.setIdFile(file);
-                    userFile.setIdContact(contactManager.getContact());
+                    userFile.setIdContact(contactManagerBl.getContact());
                     userFile.setStatus(1);
                     userFile.setTxUser(user.getIdPerson().getFirstName());
                     userFile.setTxDate(new Date());

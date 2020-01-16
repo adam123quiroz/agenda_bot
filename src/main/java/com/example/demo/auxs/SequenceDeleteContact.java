@@ -19,7 +19,6 @@ public class SequenceDeleteContact extends Sequence {
     private static final Logger LOGGER = LoggerFactory.getLogger(SequenceDeleteContact.class);
     private ContactRepository contactRepository;
 
-    private ContactManager contactManager;
     private AgUser user;
     private MainBot mainBot;
     private AgContact contact;
@@ -38,7 +37,6 @@ public class SequenceDeleteContact extends Sequence {
         this.contactRepository = contactRepository;
         this.user = user;
         this.mainBot =  mainBot;
-        this.contactManager = new ContactManager(telefonoRepository, personRepository);
 
     }
 

@@ -34,6 +34,8 @@ public class BotBl {
     private ContactRepository contactRepository;
 
     private ContactBl contactBl;
+    private ContactManagerBl contactManagerBl;
+    private ContactUpdateManagerBl contactUpdateManagerBl;
 
     private AdminChat adminChat;
 
@@ -47,7 +49,9 @@ public class BotBl {
                  ContactFileRepository contactFileRepository,
                  TelefonoRepository telefonoRepository,
                  ContactRepository contactRepository,
-                 ContactBl contactBl) {
+                 ContactBl contactBl,
+                 ContactManagerBl contactManagerBl,
+                 ContactUpdateManagerBl contactUpdateManagerBl) {
         this.userRepository = userRepository;
         this.personRepository = personRepository;
         this.fileRepository = fileRepository;
@@ -55,6 +59,8 @@ public class BotBl {
         this.telefonoRepository = telefonoRepository;
         this.contactRepository = contactRepository;
         this.contactBl = contactBl;
+        this.contactManagerBl = contactManagerBl;
+        this.contactUpdateManagerBl = contactUpdateManagerBl;
     }
 
     public List<String> processUpdate(Update update, MainBot mainBot) throws TelegramApiException, IOException {
@@ -127,7 +133,8 @@ public class BotBl {
                         contactFileRepository,
                         telefonoRepository,
                         contactRepository,
-                        user
+                        user,
+                        contactManagerBl
                 );
                 sequenceAddContact.setStepActually(0);
                 sequenceAddContact.setNumberStep(6);
@@ -139,20 +146,15 @@ public class BotBl {
 
             case "Modificar":
                 SequenceUpdateContact sequenceUpdateContact = new SequenceUpdateContact(
-                        userRepository,
-                        personRepository,
-                        fileRepository,
-                        contactFileRepository,
-                        telefonoRepository,
                         contactRepository,
                         user,
-                        mainBot
+                        mainBot,
+                        contactUpdateManagerBl
                 );
                 sequenceUpdateContact.setStepActually(0);
                 sequenceUpdateContact.setNumberStep(3);
                 sequenceUpdateContact.setRunning(true);
                 MainBot.addSequenceToList(update.getMessage().getChat().getId().toString(), sequenceUpdateContact);
-                //sequence = sequenceUpdateContact;
                 List<AgContact> contactList = contactRepository.findAllByIdUserAndStatus(user, 1);
                 ConcatListContact concatListContact = new ConcatListContact(contactList);
                 comandManager = new ComandManager(concatListContact.getStringListContact());

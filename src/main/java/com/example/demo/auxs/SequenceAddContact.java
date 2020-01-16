@@ -7,6 +7,7 @@ import com.example.demo.domain.AgFile;
 import com.example.demo.domain.AgUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 import javax.imageio.ImageIO;
@@ -16,6 +17,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
+@Transactional
 public class SequenceAddContact extends Sequence {
     private static final Logger LOGGER = LoggerFactory.getLogger(SequenceAddContact.class);
 
@@ -26,8 +28,7 @@ public class SequenceAddContact extends Sequence {
     private ContactManager contactManager;
     private AgUser user;
 
-    public SequenceAddContact(UserRepository userRepository,
-                              PersonRepository personRepository,
+    public SequenceAddContact(PersonRepository personRepository,
                               FileRepository fileRepository,
                               ContactFileRepository contactFileRepository,
                               TelefonoRepository telefonoRepository,

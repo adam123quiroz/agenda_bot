@@ -62,6 +62,7 @@ public class BotBl {
         this.mainBot = mainBot;
         List<String> chatResponse = new ArrayList<>();
         AgUser user = initUser(update.getMessage().getFrom());
+        user.getIdPerson().getFirstName();
         continueChatWithUser(user, chatResponse);
         return chatResponse;
     }
@@ -121,7 +122,6 @@ public class BotBl {
 
             case "Agregar":
                 SequenceAddContact sequenceAddContact = new SequenceAddContact(
-                        userRepository,
                         personRepository,
                         fileRepository,
                         contactFileRepository,
